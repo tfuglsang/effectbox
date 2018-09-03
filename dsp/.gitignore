@@ -1,0 +1,10 @@
+/.metadata/
+dsp/audio_processing/Debug/boot_post.map
+dsp/audio_processing/Debug/boot_post_linkInfo.xml
+dsp/audio_processing/Debug/makefile
+dsp/audio_processing/Debug/subdir_rules.mk
+
+dsp/dsp example code/ezdsp5535_v1/boot_post_SDcard/boot_post/Debug/boot_post.map
+dsp/dsp example code/ezdsp5535_v1/boot_post_SDcard/boot_post/Debug/boot_post_linkInfo.xml
+dsp/dsp example code/ezdsp5535_v1/boot_post_SDcard/boot_post/Debug/makefile
+dsp/dsp example code/ezdsp5535_v1/boot_post_SDcard/boot_post/Debug/subdir_rules.mk

@@ -8,4 +8,5 @@
 	<rts value="rts55h.lib"/>
 	<defaultAssemblyOnly value="false"/>
 	<deviceFamily value="C5500"/>
+	<isTargetManual value="false"/>
 </projectOptions>
