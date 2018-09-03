@@ -1,0 +1,1 @@
+"./aic3204_loop_linein.obj" "./aic3204_test.obj" "./aic3204_tone_headphone.obj" "./main.obj" "C:/Users/tfuglsang/workspace_v8/ezdsp5535_v1/lib/ezdsp5535bsl.lib" --library=cslVC5505.lib --library=ezdsp5535bsl.lib --library=rts55x.lib 

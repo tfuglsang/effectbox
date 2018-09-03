@@ -1,0 +1,1 @@
+"./main.obj" "./switch_test.obj" "../lnkx.cmd" --library=ezdsp5535bsl.lib --library=cslVC5505.lib --library=rts55x.lib 

@@ -1,0 +1,1 @@
+"./led_test.obj" "./main.obj" "../lnkx.cmd" --library=cslVC5505.lib --library=ezdsp5535bsl.lib --library=rts55x.lib 
