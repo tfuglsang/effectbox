@@ -1,1 +1,1 @@
-"./audio_processing.obj" "./main.obj" "./oled_interface.obj" "../lnkx.cmd" "../lib/cslVC5505.lib" "../lib/ezdsp5535bsl.lib" --library=ezdsp5535bsl.lib --library=cslVC5505.lib 
+"./audio_processing.obj" "./main.obj" "./oled_interface.obj" "./src/csl_spi.obj" "./src/csl_sysctrl.obj" "../lnkx.cmd" "../lib/cslVC5505.lib" "../lib/ezdsp5535bsl.lib" --library=ezdsp5535bsl.lib --library=cslVC5505.lib 
