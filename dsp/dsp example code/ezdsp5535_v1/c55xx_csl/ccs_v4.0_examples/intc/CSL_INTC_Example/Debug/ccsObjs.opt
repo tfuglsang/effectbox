@@ -1,1 +1,0 @@
-"./intc_example.obj" -l"Debug/cslVC5505.lib" -l"rts55x.lib" -l"rts55h.lib" "../VC5505.cmd" 
