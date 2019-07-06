@@ -1,5 +1,6 @@
 #include "main.h"
 #include "wm8731.h"
+#include "arm_math.h"
 
 __IO uint32_t ButtonOnBoardStatus = 0;  /* set to 1 after User Button interrupt  */
 
@@ -31,6 +32,8 @@ uint8_t right_gauge_value = 0;
 #define MSG_FROM_DISPLAY_ARRAY_SIZE 100
 uint8_t IncomingMsgFromDisplay[MSG_FROM_DISPLAY_ARRAY_SIZE];
 uint8_t IncomingMsgFromDisplay_WrPtr = 0;
+
+bool PROCESS_AUDIO;
 
 int main(void)
 {
@@ -115,118 +118,89 @@ int main(void)
 
   if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)DisplayTxBuffer, 6)!= HAL_OK)
   {
-	Error_Handler(9);
+	Error_Handler(HAL_ERROR_UART_TRANSMIT);
   }
 
   if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)DisplayRxBuffer, 1) != HAL_OK)
   {
 
-	 Error_Handler(17);
+	 Error_Handler(HAL_ERROR_UART_RECEIVE);
   }
 
   BSP_LED_Off(LED_GREEN);
-  
-//  for(int i = 0; i < 64; i++)
-//  {
-//	  sineWave[i] = sineWave1[i];
-//  }
-
-//  SCB_CleanDCache_by_Addr((uint32_t*)(((uint32_t)sineWave) & ~(uint32_t)0x1F), 128);
-//  HAL_I2S_Transmit(&I2sHandle, sineWave, 64,1000);
-//  SCB_CleanDCache_by_Addr((uint32_t*)(((uint32_t)sineWave) & ~(uint32_t)0x1F), 128);
-//  if(HAL_I2S_Transmit_DMA(&I2sHandle, sineWave, 64) != HAL_OK)
-//  {
-//   	  Error_Handler(87);
-//  }
 
   HAL_I2SEx_TransmitReceive_DMA(&I2sHandle, (uint16_t*)g_glueI2sTxBuff, (uint16_t*)g_glueI2sRxBuff, 512);
 
   while (1)
   {
-      if(UartHandle.RxState != HAL_UART_STATE_BUSY_RX)
-        {
-			/* Reset transmission flag */
-			HAL_UART_AbortReceive(&UartHandle);
-			if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)DisplayRxBuffer, 1) != HAL_OK)
-			{
-			Error_Handler(20);
-			}
-        }
+	  prepareDisplayMsgReceive();
+	  decodeDisplayMsg();
 
-      while(0 < IncomingMsgFromDisplay_WrPtr)
-      {
-    	  if(IncomingMsgFromDisplay[0] == 6) // if the next element is acknowledge, increment read ptr and do nothing
-    	  {
-    		  IncomingMsgFromDisplay_WrPtr--;
-    	  }
-    	  else
-    	  {
-    		  if(IncomingMsgFromDisplay[0] == 7) // cmd button pressed
-    		  {
-    			  if(IncomingMsgFromDisplay_WrPtr >= 6) // if a full button msg has been received, start decoding
-    			  {
-    				 // Find out what button has been pressed
+	  if(PROCESS_AUDIO == true)
+	  {
+
+	  }
+
+  }
+}
+
+
+
+void decodeDisplayMsg(void)
+{
+    while(0 < IncomingMsgFromDisplay_WrPtr)
+    {
+  	  if(IncomingMsgFromDisplay[0] == 6) // if the next element is acknowledge, increment read ptr and do nothing
+  	  {
+  		  IncomingMsgFromDisplay_WrPtr--;
+  	  }
+  	  else
+  	  {
+  		  if(IncomingMsgFromDisplay[0] == 7) // cmd button pressed
+  		  {
+  			  if(IncomingMsgFromDisplay_WrPtr >= 6) // if a full button msg has been received, start decoding
+  			  {
+  				 // Find out what button has been pressed
 					if (Buffercmp(IncomingMsgFromDisplay, Button_1, 6) == 0 )
 					{
 						selected_gauge = Left;
 						TIM1->CNT = left_gauge_value;
 						value = left_gauge_value;
-						SendValueToGauge(selected_gauge, value);
+						sendValueDisplayGauge(selected_gauge, value);
 					}
 					else if (Buffercmp(IncomingMsgFromDisplay, Button_2, 6) == 0 )
 					{
 						selected_gauge = Right;
 						TIM1->CNT = right_gauge_value;
 						value = right_gauge_value;
-						SendValueToGauge(selected_gauge, value);
+						sendValueDisplayGauge(selected_gauge, value);
 					}
 					IncomingMsgFromDisplay_WrPtr = IncomingMsgFromDisplay_WrPtr - 6;
-    			  }
-    			  else
-    			  {
-    				  break;
-    			  }
+  			  }
+  			  else
+  			  {
+  				  break;
+  			  }
 
-    		  }
-    	  }
-      }
-  }   
- 
+  		  }
+  	  }
+    }
 }
-int beenhere = 0;
-void CheckRotaryEncoder()
+
+void prepareDisplayMsgReceive(void)
 {
-
- // Update if value changes
-	if(value != TIM1->CNT)
+	if(UartHandle.RxState != HAL_UART_STATE_BUSY_RX)
 	{
-		beenhere = 1;
-
-		if(TIM1->CNT > 100)
+		/* Reset transmission flag */
+		HAL_UART_AbortReceive(&UartHandle);
+		if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)DisplayRxBuffer, 1) != HAL_OK)
 		{
-			TIM1->CNT = 100;
+			Error_Handler(HAL_ERROR_UART_RECEIVE);
 		}
-		if(TIM1->CNT <= 1)
-		{
-			TIM1->CNT = 1;
-		}
-		value = TIM1->CNT;
-
-		if(selected_gauge == Left)
-		{
-			left_gauge_value = value;
-		}
-
-		if(selected_gauge == Right)
-		{
-			right_gauge_value = value;
-		}
-		SendValueToGauge(selected_gauge, value);
-		beenhere = 0;
 	}
 }
 
-void SendValueToGauge(uint8_t gauge_number, uint8_t value)
+void sendValueDisplayGauge(uint8_t gauge_number, uint8_t value)
 {
 	DisplayTxBuffer[0] = 0x01;
 	DisplayTxBuffer[1] = 0x07;
@@ -242,12 +216,12 @@ void SendValueToGauge(uint8_t gauge_number, uint8_t value)
 
 	  if(HAL_UART_Transmit_IT(&UartHandle, (uint8_t*)DisplayTxBuffer, 6)!= HAL_OK)
 	  {
-		Error_Handler(9);
+		Error_Handler(HAL_ERROR_UART_TRANSMIT);
 	  }
 
       if(HAL_UART_Receive_IT(&UartHandle, (uint8_t *)DisplayRxBuffer, 1) != HAL_OK)
       {
-      Error_Handler(18);
+      Error_Handler(HAL_ERROR_UART_RECEIVE);
       }
   }
 }
@@ -272,18 +246,52 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
 {
-  Error_Handler(11);
+  Error_Handler(HAL_ERROR_UART_CALLBACK);
 }
 
+int8_t RotataryCheckInProgress = 0;
+void checkRotaryEncoder()
+{
+
+ // Update if value changes
+	if(value != TIM1->CNT)
+	{
+		RotataryCheckInProgress = 1;
+
+		if(TIM1->CNT > 100)
+		{
+			TIM1->CNT = 100;
+		}
+		if(TIM1->CNT <= 1)
+		{
+			TIM1->CNT = 1;
+		}
+		value = TIM1->CNT;
+
+		if(selected_gauge == Left)
+		{
+			left_gauge_value = value;
+		}
+
+		if(selected_gauge == Right)
+		{
+			right_gauge_value = value;
+		}
+		sendValueDisplayGauge(selected_gauge, value);
+		RotataryCheckInProgress = 0;
+	}
+}
+
+// Periodic callback to check if rotary encoder value has changed
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  //BSP_LED_Toggle(LED_BLUE);
-  if(beenhere != 1)
+  if(RotataryCheckInProgress != 1)
   {
-	  CheckRotaryEncoder();
+	  checkRotaryEncoder();
   }
 }
 
+// Callback when user button is pressed
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if(GPIO_Pin == USER_BUTTON_PIN)

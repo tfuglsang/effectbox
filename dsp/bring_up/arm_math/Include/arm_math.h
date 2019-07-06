@@ -316,7 +316,7 @@
   #error Unknown compiler
 #endif
 
-#define ARM_MATH_CM4
+#define ARM_MATH_CM7
 
 #define __CMSIS_GENERIC         /* disable NVIC and Systick functions */
 

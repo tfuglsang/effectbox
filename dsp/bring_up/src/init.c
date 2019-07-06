@@ -13,11 +13,11 @@ void InitUart(void)
   UartHandle.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
   if(HAL_UART_DeInit(&UartHandle) != HAL_OK)
   {
-    Error_Handler(3);
+    Error_Handler(HAL_ERROR_UART_INIT);
   }
   if(HAL_UART_Init(&UartHandle) != HAL_OK)
   {
-    Error_Handler(4);
+    Error_Handler(HAL_ERROR_UART_INIT);
   }
 }
 
@@ -42,11 +42,11 @@ void InitRotaryEncoder(void)
 
   if (HAL_TIM_Encoder_Init(&timer_1, &RotEncoder) != HAL_OK)
   {
-    Error_Handler(1);
+    Error_Handler(HAL_ERROR_TIMER_INIT);
   }
 
   if(HAL_TIM_Encoder_Start_IT(&timer_1,TIM_CHANNEL_1)!=HAL_OK){
-    Error_Handler(2);
+    Error_Handler(HAL_ERROR_TIMER_INIT);
  }
 }
 
@@ -61,11 +61,11 @@ void InitTim3(void)
   timer_3.Init.RepetitionCounter = 0;
   if (HAL_TIM_Base_Init(&timer_3) != HAL_OK)
   {
-    Error_Handler(21);
+    Error_Handler(HAL_ERROR_ENCODER_INIT);
   }
   if(HAL_TIM_Base_Start_IT(&timer_3)!=HAL_OK)
   {
-    Error_Handler(22);
+    Error_Handler(HAL_ERROR_ENCODER_INIT);
   }
 
   HAL_NVIC_SetPriority(TIM3_IRQn, 3, 0);
@@ -89,7 +89,7 @@ void InitI2S(void)
 
     if (HAL_I2S_Init(&I2sHandle) != HAL_OK)
     {
-      Error_Handler(HAL_ERROR_I2S);
+      Error_Handler(HAL_ERROR_I2S_INIT);
     }
 }
 
@@ -108,13 +108,12 @@ void InitI2C(void)
   if(HAL_I2C_Init(&I2cHandle) != HAL_OK)
   {
     /* Initialization Error */
-    Error_Handler(66);
+    Error_Handler(HAL_ERROR_I2C_INIT);
   }
 
   /* Enable the Analog I2C Filter */
   HAL_I2CEx_ConfigAnalogFilter(&I2cHandle,I2C_ANALOGFILTER_ENABLE);
 }
-
 
 void InitDMA(void)
 {
@@ -127,7 +126,6 @@ void InitDMA(void)
   /* DMA1_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
-
 }
 
 void InitGPIO(void)
@@ -248,7 +246,7 @@ void SystemClock_Config(void)
   ret = HAL_RCC_OscConfig(&RCC_OscInitStruct);
   if(ret != HAL_OK)
   {
-    Error_Handler(13);
+    Error_Handler(HAL_ERROR_SYSCLOCK_INIT);
   }
 
 /* Select PLL as system clock source and configure  bus clocks dividers */
@@ -265,6 +263,6 @@ void SystemClock_Config(void)
   ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4);
   if(ret != HAL_OK)
   {
-    Error_Handler(12);
+    Error_Handler(HAL_ERROR_SYSCLOCK_INIT);
   }
 }

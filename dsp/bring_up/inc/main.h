@@ -6,6 +6,7 @@
 #include "stm32h7xx_hal.h"
 #include "stm32h7xx_nucleo_144.h"
 #include "HAL_error_numbers.h"
+#include "stdbool.h"
 
 /* Definition for USARTx clock resources */
 #define USARTx                           USART6
@@ -76,7 +77,9 @@ uint8_t DisplayTxBuffer[6];
 /* Buffer used for display reception */
 uint8_t DisplayRxBuffer[6];
 
-void SendValueToGauge(uint8_t gauge_number, uint8_t value);
+void decodeDisplayMsg(void);
+void prepareDisplayMsgReceive(void);
+void sendValueDisplayGauge(uint8_t gauge_number, uint8_t value);
 void InitRotaryEncoder(void);
 void InitTim3(void);
 void InitUart(void);
