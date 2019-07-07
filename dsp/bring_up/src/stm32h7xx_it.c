@@ -115,14 +115,16 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32h7xx.s).                                               */
 /******************************************************************************/
+
 void DMA1_Stream0_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(I2sHandle.hdmatx);
 }
 void DMA1_Stream1_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(I2sHandle.hdmatx);
+  HAL_DMA_IRQHandler(I2sHandle.hdmarx);
 }
+
 void USART6_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&UartHandle);
@@ -137,53 +139,13 @@ void TIM3_IRQHandler(void){
  HAL_TIM_IRQHandler(&timer_3);
 }
 
-void I2Cx_EV_IRQHandler(void) // This function is redefined in "main.h" and related to I2C data transmission
+void I2C2_EV_IRQHandler(void) // This function is redefined in "main.h" and related to I2C data transmission
 {
   HAL_I2C_EV_IRQHandler(&I2cHandle);
 }
 
-void I2Cx_ER_IRQHandler(void) // This function is redefined in "main.h" and related to I2C error
+void I2C2_ER_IRQHandler(void) // This function is redefined in "main.h" and related to I2C error
 {
   HAL_I2C_ER_IRQHandler(&I2cHandle);
-}
-
-void SPI1_IRQHandler(void)
-{
-  HAL_I2S_IRQHandler(&I2sHandle);
-}
-uint16_t cb_cnt = 0;
-void HAL_I2S_RxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-	cb_cnt++;
-}
-
-void HAL_I2S_RxCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-	cb_cnt++;
-}
-
-void HAL_I2S_TxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-	cb_cnt++;
-}
-
-void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-	cb_cnt++;
-}
-
-void HAL_I2SEx_TxRxHalfCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-	cb_cnt++;
-}
-
-void HAL_I2SEx_TxRxCpltCallback(I2S_HandleTypeDef *hi2s)
-{
-	cb_cnt++;
-}
-
-void HAL_I2S_DMAError(I2S_HandleTypeDef *I2sHandle)
-{
-	BSP_LED_On(LED_RED);
 }
 

@@ -41,9 +41,19 @@ uint8_t DisplayTxBuffer[6];
 /* Buffer used for display reception */
 uint8_t DisplayRxBuffer[6];
 
-void decodeDisplayMsg(void);
-void prepareDisplayMsgReceive(void);
-void sendValueDisplayGauge(uint8_t gauge_number, uint8_t value);
+#define MSG_FROM_DISPLAY_ARRAY_SIZE 100
+static uint8_t IncomingMsgFromDisplay[MSG_FROM_DISPLAY_ARRAY_SIZE];
+static uint8_t IncomingMsgFromDisplay_WrPtr = 0;
+static enum SelectedGauge {Left = 0, Right = 1};
+static uint8_t value = 0;
+static uint8_t selected_gauge = Left;
+static uint8_t left_gauge_value = 0;
+static uint8_t right_gauge_value = 0;
+
+void DecodeDisplayMsg(void);
+void PrepareDisplayMsgReceive(void);
+void SendValueToGauge(uint8_t gauge_number, uint8_t value);
+
 void InitCodec(void);
 void InitRotaryEncoder(void);
 void InitTim3(void);
@@ -53,6 +63,7 @@ void InitI2C(void);
 void InitI2S(void);
 void InitDMA(void);
 void MPU_Conf(void);
+
 void Reset_DisplayRxBuffer(void);
 
 void SystemClock_Config(void);

@@ -1,8 +1,47 @@
 #include "main.h"
+#include "wm8731.h"
 
 void InitCodec(void)
 {
+  // CODEC MASTER
+  SendCodecCmd(WM8731_REG_RESET, 0x00);
+  SendCodecCmd(0x00, 0x17); // l in mute = 0
+  SendCodecCmd(0x01, 0x17); // r in mute = 0
+  SendCodecCmd(0x04, 0x12); // dac select = 1, mute mic = 1
+  SendCodecCmd(0x05, 0x00); // dac mute = 0,  adc hp filter enable
+  SendCodecCmd(0x06, 0x02); // microphone powerdown = 1
+  SendCodecCmd(0x07, 0x42); // master mode, 16 bit, i2s format
+  //SendCodecCmd(0x07, 0x4E); // master mode, 32 bit, i2s format
+  SendCodecCmd(0x09, 0x01); // active control = 1
 
+  /*
+    // DAC -> headphone
+    SendCodecCmd(WM8731_REG_RESET, 0x00);
+    SendCodecCmd(0x04, 0x12);
+    SendCodecCmd(0x05, 0x00);
+    SendCodecCmd(0x06, 0x07);
+    SendCodecCmd(0x07, 0x4E); // master mode, 16 bit, i2s format
+    SendCodecCmd(0x09, 0x09);
+  */
+  /*
+    // Passthrough: line_in -> hp out
+    SendCodecCmd(WM8731_REG_RESET, 0x00);
+    SendCodecCmd(0x04, 0x0A); // l in mute = 0
+    SendCodecCmd(0x06, 0x0E); // r in mute = 0
+    SendCodecCmd(0x09, 0x01); // active control = 1
+  */
+
+  /*
+    //  line_in -> ADC
+    SendCodecCmd(WM8731_REG_RESET, 0x00);
+    SendCodecCmd(0x00, 0x17);
+    SendCodecCmd(0x01, 0x17);
+    SendCodecCmd(0x04, 0x02);
+    SendCodecCmd(0x05, 0x09);
+    SendCodecCmd(0x07, 0x4E); // master mode, 16 bit, i2s format
+    SendCodecCmd(0x06, 0x0A);
+    SendCodecCmd(0x09, 0x01);
+  */
 }
 
 void InitUart(void)
@@ -31,7 +70,7 @@ void InitRotaryEncoder(void)
   timer_1.Instance = TIM1;
   timer_1.Init.Prescaler = 0;
   timer_1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  timer_1.Init.Period = 0xFFFF;
+  timer_1.Init.Period = 200;
   timer_1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   //timer.Init.RepetitionCounter = 0;
   RotEncoder.EncoderMode = TIM_ENCODERMODE_TI12;
@@ -79,19 +118,41 @@ void InitTim3(void)
 
 void InitI2S(void)
 {
-
-    I2sHandle.Instance = SPI2;
-    I2sHandle.Init.Mode = I2S_MODE_MASTER_FULLDUPLEX;
+    I2sHandle.Instance = SPI1;
+    I2sHandle.Init.Mode = I2S_MODE_SLAVE_FULLDUPLEX;
     I2sHandle.Init.Standard = I2S_STANDARD_PHILIPS;
     I2sHandle.Init.DataFormat = I2S_DATAFORMAT_16B;
-    I2sHandle.Init.MCLKOutput = I2S_MCLKOUTPUT_ENABLE;
+    I2sHandle.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
     I2sHandle.Init.AudioFreq = I2S_AUDIOFREQ_48K;
     I2sHandle.Init.CPOL = I2S_CPOL_LOW;
     I2sHandle.Init.FirstBit = I2S_FIRSTBIT_MSB;
-    I2sHandle.Init.WSInversion = I2S_WS_INVERSION_DISABLE;
+    I2sHandle.Init.WSInversion = I2S_WS_INVERSION_ENABLE;
     I2sHandle.Init.Data24BitAlignment = I2S_DATA_24BIT_ALIGNMENT_RIGHT;
     I2sHandle.Init.MasterKeepIOState = I2S_MASTER_KEEP_IO_STATE_DISABLE;
 
+    __HAL_DMA_DISABLE(&DMA_I2s_rx_Handle);
+    HAL_Delay(1);
+    __HAL_DMA_DISABLE(&DMA_I2s_tx_Handle);
+
+    __HAL_DMA_ENABLE(&DMA_I2s_rx_Handle);
+    HAL_Delay(1);
+    __HAL_DMA_ENABLE(&DMA_I2s_tx_Handle);
+
+    __HAL_DMA_RESET_HANDLE_STATE(&DMA_I2s_tx_Handle);
+    HAL_Delay(1);
+
+    __HAL_I2S_DISABLE(&I2sHandle);
+    HAL_Delay(1);
+    __HAL_I2S_ENABLE(&I2sHandle);
+    __HAL_I2S_RESET_HANDLE_STATE(&I2sHandle);
+
+    RCC->APB2RSTR |= RCC_APB2RSTR_SPI1RST; //reset SPI1
+	RCC->APB2RSTR &= ~RCC_APB2RSTR_SPI1RST; //reset SPI1
+
+    if (HAL_I2S_DeInit(&I2sHandle) != HAL_OK)
+    {
+      Error_Handler(HAL_ERROR_I2S_INIT);
+    }
     if (HAL_I2S_Init(&I2sHandle) != HAL_OK)
     {
       Error_Handler(HAL_ERROR_I2S_INIT);
@@ -160,7 +221,7 @@ void MPU_Conf()
 	  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
 
 	  MPU_InitStruct.BaseAddress = 0x30000000;
-	  MPU_InitStruct.Size = MPU_REGION_SIZE_512B;
+	  MPU_InitStruct.Size = MPU_REGION_SIZE_4KB;
 
 	  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
 	  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
