@@ -62,6 +62,8 @@ int main(void)
 
   InitGPIO();
 
+  InitCodec();
+
   /* Configure User push-button in Interrupt mode */
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
 

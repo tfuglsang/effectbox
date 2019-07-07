@@ -123,7 +123,7 @@ void DMA1_Stream1_IRQHandler(void)
 {
   HAL_DMA_IRQHandler(I2sHandle.hdmatx);
 }
-void USARTx_IRQHandler(void)
+void USART6_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&UartHandle);
 }

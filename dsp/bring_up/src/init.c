@@ -1,9 +1,14 @@
 #include "main.h"
 
+void InitCodec(void)
+{
+
+}
+
 void InitUart(void)
 {
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-  UartHandle.Instance        = USARTx;
+  UartHandle.Instance        = USART6;
   UartHandle.Init.BaudRate   = 115200;
   UartHandle.Init.WordLength = UART_WORDLENGTH_8B;
   UartHandle.Init.StopBits   = UART_STOPBITS_1;
@@ -96,7 +101,7 @@ void InitI2S(void)
 void InitI2C(void)
 {
   /*##-1- Configure the I2C peripheral ######################################*/
-  I2cHandle.Instance             = I2Cx;
+  I2cHandle.Instance             = I2C2;
   I2cHandle.Init.Timing          = I2C_TIMING;
   I2cHandle.Init.OwnAddress1     = I2C_ADDRESS;
   I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
