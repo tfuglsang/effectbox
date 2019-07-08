@@ -30,4 +30,5 @@
 #define WM8731_Deactivate          0x00       // Module is OFF
 #define WM8731_Reset               0x00       // Reset value
 
+void InitWM8731(void);
 void SendCodecCmd(uint16_t address, uint16_t cmd);

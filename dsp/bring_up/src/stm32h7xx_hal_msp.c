@@ -214,22 +214,7 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
 
 	HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
-/*
-    __HAL_DMA_DISABLE(&DMA_I2s_rx_Handle);
-    __HAL_DMA_DISABLE(&DMA_I2s_tx_Handle);
-    HAL_Delay(1);
-    __HAL_DMA_ENABLE(&DMA_I2s_rx_Handle);
-    __HAL_DMA_ENABLE(&DMA_I2s_tx_Handle);
-
-    __HAL_I2S_DISABLE(&I2sHandle);
-    HAL_Delay(1);
-    __HAL_I2S_ENABLE(&I2sHandle);
-
-    RCC->APB2RSTR |= RCC_APB2RSTR_SPI1RST; //reset SPI1
-    RCC->APB2RSTR &= ~RCC_APB2RSTR_SPI1RST; //reset SPI1
-    */
   }
-
 }
 
 /**

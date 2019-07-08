@@ -15,9 +15,6 @@
 /* This example use TIMING to 0x00901954 to reach 400 kHz speed (Rise time = 100 ns, Fall time = 10 ns) */
 #define I2C_TIMING      0x00901954
 
-// UART instance for touch display interfacing
-UART_HandleTypeDef UartHandle;
-
 // I2C instance for codec communication
 I2C_HandleTypeDef I2cHandle;
 
@@ -34,17 +31,37 @@ TIM_HandleTypeDef timer_1;
 
 // Timer 3 used to check state of rotary, and if state has changed, then update display
 TIM_HandleTypeDef timer_3;
-  
-/* Buffer used for display transmission */
-uint8_t DisplayTxBuffer[6];
 
-/* Buffer used for display reception */
-uint8_t DisplayRxBuffer[6];
+//// DISPLAY RELATED STUFF BELOW ///
+
+// UART instance for touch display interfacing
+UART_HandleTypeDef UartHandle;
+  
+#define MSG_FROM_DISPLAY_ARRAY_SIZE 100
+uint8_t DisplayTxBuffer[6]; 									// Buffer used for display transmission
+uint8_t DisplayRxBuffer[6]; 									// Buffer used for display reception
+uint8_t IncomingMsgFromDisplay[MSG_FROM_DISPLAY_ARRAY_SIZE];	// Queue for incoming display messages
+uint8_t IncomingMsgFromDisplay_WrPtr;							// Keeps track of the next byte to decode in the message queue
+
+enum SelectedGauge
+{
+	Left = 0,
+	Right = 1
+};
+uint8_t value;
+uint8_t selected_gauge;
+uint8_t left_gauge_value;
+uint8_t right_gauge_value;
 
 void DecodeDisplayMsg(void);
 void PrepareDisplayMsgReceive(void);
 void SendValueToGauge(uint8_t gauge_number, uint8_t value);
+void Reset_DisplayRxBuffer(void);
+uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
 
+//// DISPLAY RELATED STUFF ABOVE ////
+
+// Initialization functions
 void InitCodec(void);
 void InitRotaryEncoder(void);
 void InitTim3(void);
@@ -55,11 +72,8 @@ void InitI2S(void);
 void InitDMA(void);
 void MPU_Conf(void);
 
-void Reset_DisplayRxBuffer(void);
-
 void SystemClock_Config(void);
 void Error_Handler(uint8_t error_no);
-uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
 void CPU_CACHE_Enable(void);
 
 
