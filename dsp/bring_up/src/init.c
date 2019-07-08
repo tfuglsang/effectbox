@@ -10,8 +10,8 @@ void InitCodec(void)
   SendCodecCmd(0x04, 0x12); // dac select = 1, mute mic = 1
   SendCodecCmd(0x05, 0x00); // dac mute = 0,  adc hp filter enable
   SendCodecCmd(0x06, 0x02); // microphone powerdown = 1
-  SendCodecCmd(0x07, 0x42); // master mode, 16 bit, i2s format
-  //SendCodecCmd(0x07, 0x4E); // master mode, 32 bit, i2s format
+  //SendCodecCmd(0x07, 0x42); // master mode, 16 bit, i2s format
+  SendCodecCmd(0x07, 0x4E); // master mode, 32 bit, i2s format
   SendCodecCmd(0x09, 0x01); // active control = 1
 
   /*
@@ -121,7 +121,7 @@ void InitI2S(void)
     I2sHandle.Instance = SPI1;
     I2sHandle.Init.Mode = I2S_MODE_SLAVE_FULLDUPLEX;
     I2sHandle.Init.Standard = I2S_STANDARD_PHILIPS;
-    I2sHandle.Init.DataFormat = I2S_DATAFORMAT_16B;
+    I2sHandle.Init.DataFormat = I2S_DATAFORMAT_32B;
     I2sHandle.Init.MCLKOutput = I2S_MCLKOUTPUT_DISABLE;
     I2sHandle.Init.AudioFreq = I2S_AUDIOFREQ_48K;
     I2sHandle.Init.CPOL = I2S_CPOL_LOW;
@@ -221,7 +221,7 @@ void MPU_Conf()
 	  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
 
 	  MPU_InitStruct.BaseAddress = 0x30000000;
-	  MPU_InitStruct.Size = MPU_REGION_SIZE_4KB;
+	  MPU_InitStruct.Size = MPU_REGION_SIZE_8KB;
 
 	  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
 	  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
@@ -280,6 +280,7 @@ void SystemClock_Config(void)
 {
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_OscInitTypeDef RCC_OscInitStruct;
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
 
   HAL_StatusTypeDef ret = HAL_OK;
 
@@ -328,6 +329,16 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
   ret = HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4);
   if(ret != HAL_OK)
+  {
+    Error_Handler(HAL_ERROR_SYSCLOCK_INIT);
+  }
+
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6|RCC_PERIPHCLK_SPI1
+                              |RCC_PERIPHCLK_I2C2;
+  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL;
+  PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
+  PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler(HAL_ERROR_SYSCLOCK_INIT);
   }
