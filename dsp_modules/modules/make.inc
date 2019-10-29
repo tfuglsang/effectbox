@@ -24,7 +24,7 @@ export AR:=mingw32-gcc-ar.exe
 export RANLIB:=mingw32-gcc-ranlib.exe
 
 #Arm
-export ARM_DIR := $(project_root_dir)/toolchain/armeabi
+export ARM_DIR := $(platform_root_dir)/toolchain/armeabi
 ARM_BIN := $(ARM_DIR)/bin
 ARM_CC := $(ARM_BIN)/arm-none-eabi-gcc.exe
 ARM_AS := $(ARM_BIN)/arm-none-eabi-as.exe
