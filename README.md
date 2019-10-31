@@ -23,8 +23,8 @@ The repository is divided into 3 parts:
   - Project files for the 4D-systems display
   
 TO DO:
-Implement reverb.
-Utilize TCM (tighly coupled memory) for both data and instruction.
-Implement USB recording/playback support.
-Add pictures of the box and screendump of the display
-Add block-diagram of hardware configuration
+- Implement reverb.
+- Utilize TCM (tighly coupled memory) for both data and instruction.
+- Implement USB recording/playback support.
+- Add pictures of the box and screendump of the display
+- Add block-diagram of hardware configuration
