@@ -18,9 +18,9 @@ Next effect to be implemented is reverb.
 I'm not completely satisfied with the sound of the'standard' Schroeder reverberator (http://www.aes.org/e-lib/browse.cfm?elib=849) so I'm experimenting with alternative solutions.
 
 The repository is divided into 3 parts:
-  - Source code for STM32H7
-  - A small framework that can build the binaries for algorithms used in the project, and compare the output with a reference MATLAB           implementation to maintain a decent bit-accuracy.
-  - Project files for the 4D-systems display
+  - stm (source code for STM32H7)
+  - dsp_modules (a small framework that can build the binaries for algorithms used in the project, and compare the output with a reference MATLAB implementation to maintain a decent bit-accuracy)
+  - display (project files for the 4D-systems display)
   
 TO DO:
 - Implement reverb.
