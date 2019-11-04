@@ -8,6 +8,8 @@ The project started out on a TI TMS320C5535, but I thoroughly disliked the TI Co
 
 A WM8731 audio codec is used as ADC/DAC and runs @ 48kHz.
 
+![alt text](https://github.com/tfuglsang/effectbox/blob/master/flowchart.jpg)
+
 So far 4 effects are implemented:
   - Wah Wah
   - Flanger
@@ -21,7 +23,11 @@ The repository is divided into 3 parts:
   - stm (source code for STM32H7)
   - dsp_modules (a small framework that can build the binaries for algorithms used in the project, and compare the output with a reference MATLAB implementation to maintain a decent bit-accuracy)
   - display (project files for the 4D-systems display)
-  
+
+Early development:
+  ![alt text](https://github.com/tfuglsang/effectbox/blob/master/devo1.jpg)
+  ![alt text](https://github.com/tfuglsang/effectbox/blob/master/devo2.jpg)
+Installed in black aluminium console box:
   ![alt text](https://github.com/tfuglsang/effectbox/blob/master/box1.jpg)
   
 TO DO:
