@@ -22,7 +22,7 @@ The repository is divided into 3 parts:
   - dsp_modules (a small framework that can build the binaries for algorithms used in the project, and compare the output with a reference MATLAB implementation to maintain a decent bit-accuracy)
   - display (project files for the 4D-systems display)
   
-  ![alt text](https://drive.google.com/open?id=0B0oJ6huzHqSfMkNFR0N1M1hERGJnaHkzVUEzeUNSTWotQkdr)
+  ![alt text](https://github.com/tfuglsang/effectbox/blob/master/box1.jpg)
   
 TO DO:
 - Implement reverb.
