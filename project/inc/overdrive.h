@@ -17,7 +17,7 @@ private:
 	float m_OutputBuffer[OVERDRIVE_MAX_BLOCKSIZE];
 	float* m_InputPtr;
 public:
-	OverdriveModule(){
+	OverdriveModule() : m_InputPtr(NULL){
 		m_Threshold = OVERDRIVE_THRESHOLD;
 	};
 	~OverdriveModule(){};

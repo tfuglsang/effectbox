@@ -30,7 +30,7 @@ public:
 	float m_DelayOffset;
 
 public:
-	FlangerModule(){};
+	FlangerModule() : m_MaxDelayunits(0),m_SamplingRate(0),m_PiCnt(0),m_PiReset(0),m_SinTerm(0),m_SinInc(0),m_InputPtr(NULL),m_WrPtr(0),m_TimeShiftIdx(0),m_N(0),m_Rate(0),m_DelayOffset(0){};
 	~FlangerModule(){};
 	void Apply() override;
 	void SetMemberValue(uint8_t MemberId, uint8_t Value) override;

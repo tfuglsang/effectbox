@@ -1,35 +1,36 @@
 #include <audio_process.h>
 #include "codec.h"
 
-float InputMono[AUDIO_BLOCKSIZE / 2];
+/*
+DTCM-RAM on TCM interface is mapped at the address 0x2000 0000 and accessible
+by Cortex®-M7, and by MDMA through AHBS slave bus of the Cortex®-M7 CPU. The
+DTCM-RAM can be used as read-write segment to host critical real-time data (such as
+stack and heap) for application running on Cortex®-M7 CPU.
+*/
+#define __ATTR_RAM_DTCM __attribute__ ((section(".DTCMRAM"))) __attribute__ ((aligned (4)))
 
-AudioProcess audioprocess;
+AudioProcess audioprocess __ATTR_RAM_DTCM; // Use TCM ram for storing audio modules:
 
 int AudioProcess :: Init(int blocksize, float* input_ptr)
 {
 	this->m_InputPtr = input_ptr;
 	this->m_Blocksize = blocksize;
 
-	biquad.Init(m_Blocksize/2, InputMono);
+	biquad.Init(m_Blocksize, this->m_InputPtr);
 
-	flanger.Init(m_Blocksize/2, biquad.GetOutputPtr());
+	flanger.Init(m_Blocksize, biquad.GetOutputPtr());
 
-	overdrive.Init(m_Blocksize/2, flanger.GetOutputPtr());
+	overdrive.Init(m_Blocksize, flanger.GetOutputPtr());
 
-	wah.Init(m_Blocksize/2, overdrive.GetOutputPtr());
+	wah.Init(m_Blocksize, overdrive.GetOutputPtr());
 
-	volume.Init(m_Blocksize/2, wah.GetOutputPtr());
+	volume.Init(m_Blocksize, wah.GetOutputPtr());
 
 	return 0;
 }
 
 void AudioProcess :: Apply()
 {
-	for(int i = 0; i < m_Blocksize / 2 ; i++)
-	{
-		InputMono[i] = m_InputPtr[i * 2] / 2147483648;
-	}
-
 	biquad.Apply();
 
 	flanger.Apply();
@@ -42,7 +43,7 @@ void AudioProcess :: Apply()
 
 	float* FinalOutputPtr = volume.GetOutputPtr();
 
-	for(int i = 0; i < m_Blocksize/2; i++)
+	for(int i = 0; i < m_Blocksize; i++)
 	{
 		this->m_OutputBuffer[i*2] = FinalOutputPtr[i] * 2147483648;
 		this->m_OutputBuffer[i*2+1] = FinalOutputPtr[i] * 2147483648;
@@ -75,21 +76,4 @@ float* AudioProcessGetOutputBuffer()
 {
 	return audioprocess.GetOutputPtr();
 }
-/*
-void audio_process_apply(t_audio_process_data *data)
-{
-	for(int i = 0; i < AUDIO_BLOCKSIZE / 2 ; i++)
-	{
-		input_mono[i] = data->input[i * 2] / 2147483648;
-	}
 
-
-
-	float* output_ptr = volume.GetOutputPtr();
-	for(int i = 0; i < AUDIO_BLOCKSIZE/2; i++)
-	{
-		data->output[i*2] = output_ptr[i] * 2147483648;
-		data->output[i*2+1] = output_ptr[i] * 2147483648;
-	}
-}
-*/

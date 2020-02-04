@@ -5,7 +5,7 @@
 #include <overdrive.h>
 #include <volume.h>
 
-#define AUDIO_BLOCKSIZE 128*2
+#define AUDIO_BLOCKSIZE 128
 #define SAMPLING_RATE 48000
 
 #ifdef __cplusplus
@@ -30,7 +30,7 @@ private:
 	float m_OutputBuffer[VOLUME_MAX_BLOCKSIZE];
 
 public:
-	AudioProcess(){};
+	AudioProcess() : m_InputPtr(NULL) {};
 	~AudioProcess(){};
 	void Apply() override;
 	int Init(int blocksize, float* input_ptr);

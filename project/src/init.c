@@ -135,14 +135,6 @@ void InitDMA(void)
   /* DMA1_Stream0_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
-
-
-	I2sHandle.hdmarx->XferHalfCpltCallback = RxHalfTransferCplt;
-	I2sHandle.hdmarx->XferCpltCallback  = RxFullTransferCplt;
-
-	I2sHandle.hdmatx->XferHalfCpltCallback = TxHalfTransferCplt;
-	I2sHandle.hdmatx->XferCpltCallback  = TxFullTransferCplt;
-
 }
 
 void InitGPIO(void)

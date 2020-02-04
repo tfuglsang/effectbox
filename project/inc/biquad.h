@@ -38,7 +38,9 @@ private:
 	float m_Dlyline[NUMBER_OF_BIQUADS*BIQUAD_N_DLY];
 
 public:
-	BiquadModule(){};
+	BiquadModule() : m_MidLowShelfW0(0),m_MidHighShelfW0(0),m_BassW0(0),m_TrebleW0(0),m_BassGain(0),m_MidGain(0),m_TrebleGain(0),
+	m_BassPtr(NULL),m_MidPtr(NULL),m_TreblePtr(NULL),m_InputPtr(NULL),m_OutputPtr(NULL),m_DlylineLength(0)
+	{};
 	~BiquadModule(){};
 	void Apply() override;
 	void Init(int blocksize, float* input_ptr);

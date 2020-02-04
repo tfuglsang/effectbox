@@ -18,7 +18,7 @@ private:
 	int m_ActiveCodecInputInterface;
 
 public:
-	VolumeModule(){};
+	VolumeModule() : m_InputPtr(NULL), m_Volume(0),m_MicBoost(0),m_GainLineIn(0),m_GainOut(0),m_ActiveCodecInputInterface(0) {};
 	~VolumeModule(){};
 	void Apply() override;
 	int Init(int blocksize, float* input_ptr);

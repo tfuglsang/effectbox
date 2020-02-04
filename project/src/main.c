@@ -6,36 +6,48 @@
 #include <init.h>
 #include <audio_process.h>
 
-volatile bool I2S_FRAME_RECEIVED;
-
+/*
+ AHB SRAM1 is mapped at address 0x3000 0000 and accessible by all system
+masters except BDMA through D2 domain AHB matrix. AHB SRAM1 can be used
+as DMA buffers to store peripheral input/output data in D2 domain
+ */
 #define __ATTR_RAM_D2 __attribute__ ((section(".RAM_D2"))) __attribute__ ((aligned (4)))
 
 /** I2S DMA buffers - placed in D2 memory */
-static uint32_t g_glueI2sRxBuff[I2S_FRAME_SIZE] __ATTR_RAM_D2;
-static uint32_t g_glueI2sTxBuff[I2S_FRAME_SIZE] __ATTR_RAM_D2;
+volatile uint32_t g_glueI2sRxBuff[I2S_FRAME_SIZE] __ATTR_RAM_D2;
+volatile uint32_t g_glueI2sTxBuff[I2S_FRAME_SIZE] __ATTR_RAM_D2;
 
+// Incoming I2S DMA buffers are copied here (in interrupt)
+volatile q31_t I2S_InBuf[I2S_FRAME_SIZE / 2] __ATTR_RAM_D2;
+
+// Audio data is copied to here (as mono)
+float AudioProcessInBuf[AUDIO_BLOCKSIZE] __ATTR_RAM_D2;
+
+// Indicates if a frame is ready to be processed
+volatile bool I2S_FRAME_RECEIVED;
+
+// This is the length of the msg we expect to receive over UART (from display)
 int NumberOfUARTWordToReceive = 1;
-
-static q31_t I2S_InBuf[AUDIO_BLOCKSIZE] __ATTR_RAM_D2; // Incoming I2S DMA buffers are copied here
-static float AudioProcessInBuf[AUDIO_BLOCKSIZE] __ATTR_RAM_D2;
 
 int main(void) {
 
 	MPU_Conf();
 	CPU_CACHE_Enable();
 	HAL_Init();
-	/* Configure the system clock to 400 MHz */
+	// Configure the system clock to 400 MHz
 	SystemClock_Config();
 
-	/* Configure LED1, LED2 and LED3 */
+	// Configure LED1, LED2 and LED3
 	BSP_LED_Init(LED1);
 	BSP_LED_Init(LED2);
 	BSP_LED_Init(LED3);
 
-	InitGPIO(); // flick GPIO to reset display
+	// Flick GPIO pull reset pin on display
+	InitGPIO();
 
 	InitI2S();
 
+	// Setup ping-pong DMA
 	InitDMA();
 
 	InitUart();
@@ -55,7 +67,9 @@ int main(void) {
 	// Wait for display to refresh
 	HAL_Delay(500);
 
-	InitRotaryEncoder(); // Uses TIM1
+	// Use TIM1 for rotary encoder
+	InitRotaryEncoder();
+	// Set encoder value to 100 (default start-up volume)
 	TIM1->CNT = 100;
 
 	for (int i = 0; i < I2S_FRAME_SIZE; i++) {
@@ -63,7 +77,14 @@ int main(void) {
 		g_glueI2sRxBuff[i] = 0;
 	}
 
+	// Start DMA transmission
 	HAL_I2SEx_TransmitReceive_DMA(&I2sHandle, (uint16_t*) g_glueI2sTxBuff, (uint16_t*) g_glueI2sRxBuff, I2S_FRAME_SIZE);
+
+	I2sHandle.hdmarx->XferHalfCpltCallback = RxHalfTransferCplt;
+	I2sHandle.hdmarx->XferCpltCallback  = RxFullTransferCplt;
+
+	I2sHandle.hdmatx->XferHalfCpltCallback = TxHalfTransferCplt;
+	I2sHandle.hdmatx->XferCpltCallback  = TxFullTransferCplt;
 
 	//SCB_InvalidateDCache_by_Addr((uint32_t*)(((uint32_t)g_glueI2sRxBuff) & ~(uint32_t)0x1F), 1024);
 	//SCB_InvalidateDCache_by_Addr((uint32_t*)&g_glueI2sRxBuff[0], 1024+32);
@@ -73,8 +94,10 @@ int main(void) {
 		if (I2S_FRAME_RECEIVED == true ) {
 			I2S_FRAME_RECEIVED = false;
 
-			for (int i = 0; i < I2S_FRAME_SIZE/2; i++) {
-				AudioProcessInBuf[i] = (float)I2S_InBuf[i];
+			for(int i = 0; i < AUDIO_BLOCKSIZE ; i++)
+			{
+				// Cast to float and cap values between -1 to 1
+				AudioProcessInBuf[i] = (float)I2S_InBuf[i * 2] / 2147483648;
 			}
 
 			AudioProcessApply();
@@ -90,7 +113,6 @@ void RxHalfTransferCplt()
 {
 	for (int i = 0; i < I2S_FRAME_SIZE/2; i++) {
 		I2S_InBuf[i] = (q31_t)g_glueI2sRxBuff[i];
-		//AudioProcessInBuf[i] = (float)I2S_InBuf[i];
 	}
 	I2S_FRAME_RECEIVED = 1;
 }
@@ -98,7 +120,6 @@ void RxFullTransferCplt()
 {
 	for (int i = 0; i < I2S_FRAME_SIZE/2; i++) {
 		I2S_InBuf[i] = (q31_t)g_glueI2sRxBuff[i + I2S_FRAME_SIZE/2];
-		//AudioProcessInBuf[i] = (float)I2S_InBuf[i];
 	}
 	I2S_FRAME_RECEIVED = 1;
 }

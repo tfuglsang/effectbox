@@ -29,6 +29,10 @@ private:
 
 public:
 	WahModule(){
+		m_InputPtr = NULL;
+		m_YbOld = 0;
+		m_YlOld = 0;
+
 		m_Q = WAH_Q; // pass band width, lower value means smaller band
 		m_FreqLow = WAH_FREQ_LOW;
 		m_FreqHigh = WAH_FREQ_HIGH;

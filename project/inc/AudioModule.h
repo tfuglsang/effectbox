@@ -14,11 +14,12 @@ extern "C" {
 		int m_Blocksize;
 		int m_SamplingRate;
 
-		AudioModule()
+		/* abstract class (pure virtual)
+		virtual AudioModule()
 		{
-
 		}
-		~AudioModule()
+		*/
+		virtual ~AudioModule()
 		{
 
 		}
