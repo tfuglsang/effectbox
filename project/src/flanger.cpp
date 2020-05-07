@@ -13,7 +13,7 @@ int FlangerModule :: Init(int blocksize, float* input_ptr) {
     if (blocksize>FLANGER_MAX_BLOCKSIZE) return 1;
 
     // no errors, go on..
-    m_Enable = 1;
+    m_Enable = 0;
     m_InputPtr = input_ptr;
     m_Blocksize = blocksize;
     m_SamplingRate = FLANGER_SAMPLING_RATE;

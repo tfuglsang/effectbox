@@ -11,7 +11,7 @@ int OverdriveModule :: Init(int blocksize, float* input_ptr) {
 
     m_InputPtr = input_ptr;
     m_Blocksize = blocksize;
-    m_Enable = 1;
+    m_Enable = 0;
 
     Reset();
     m_Init_ok = 1;

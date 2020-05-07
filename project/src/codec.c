@@ -33,7 +33,7 @@ void CodecInit(int mode)
 			CodecSendCmd(WM8731_REG_RESET, 0x00);
 			CodecSendCmd(0x01, 0x17); // r in mute = 0
 			CodecSendCmd(0x04, 0x12); // dac select = 1, mute mic = 1
-			CodecSendCmd(0x05, 0x01); // dac mute = 0,  adc hp filter enable
+			CodecSendCmd(0x05, 0x00); // dac mute = 0,  adc hp filter enable
 			CodecSendCmd(0x06, 0x02); // microphone powerdown = 1
 			//codec_send_cmd(0x07, 0x42); // master mode, 16 bit, i2s format
 			CodecSendCmd(0x07, 0x4E); // master mode, 32 bit, i2s format

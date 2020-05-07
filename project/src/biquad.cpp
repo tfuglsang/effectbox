@@ -66,7 +66,7 @@ float BiquadModule :: DoAllBiquads(float input)
     return output;
 }
 
-void BiquadModule :: Init(int blocksize, float* input_ptr)
+int BiquadModule :: Init(int blocksize, float* input_ptr)
 {
 	m_InputPtr = input_ptr;
 	m_OutputPtr = m_OutputBuffer;
@@ -89,6 +89,8 @@ void BiquadModule :: Init(int blocksize, float* input_ptr)
     SetTrebleFilter(100);
 
     Reset();
+
+    return 1;
 }
 
 void BiquadModule :: Reset()

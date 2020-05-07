@@ -56,7 +56,7 @@ int main(void) {
 
 	AudioProcessInit(AUDIO_BLOCKSIZE, AudioProcessInBuf);
 
-	CodecInit(MODE_JACK_IN);
+	CodecInit(MODE_LINE_IN);
 
 	// Wait some time to make sure display has booted
 	HAL_Delay(3000);

@@ -34,6 +34,7 @@
 #define Switch_Flanger		 		1
 #define Switch_Mic_boost	 		2
 #define Switch_Overdrive	 		3
+#define Switch_Reverb		 		4
 
 // Sliders
 #define Slider_Gain_out				0

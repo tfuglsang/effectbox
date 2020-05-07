@@ -54,8 +54,10 @@ void VolumeModule :: SetMemberValue(uint8_t MemberId, uint8_t Value){
 		m_Volume /= 100;
 	}
 	else if(MemberId == ModifiableMembers::MicBoost)
+	{
 		m_MicBoost = Value;
-
+		CodecSetMicBoost(Value);
+	}
 	else if(MemberId == ModifiableMembers::GainLineIn)
 	{
 		// Convert from a display value (0 to 100) to a gain value (0 to 12)

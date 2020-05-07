@@ -8,7 +8,7 @@ int WahModule :: Init(int blocksize, float* input_ptr) {
 
     // no errors, go on..
     m_InputPtr = input_ptr;
-    m_Enable = 1;
+    m_Enable = 0;
     m_Blocksize = blocksize;
     m_SamplingRate = WAH_SAMPLINGRATE;
 

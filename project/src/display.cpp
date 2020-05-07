@@ -54,6 +54,8 @@ DisplayModuleID DisplayWahSwitchID		= {DisplayObjectSwitch, Switch_Wah};
 
 DisplayModuleID DisplayOverdriveSwitchID	= {DisplayObjectSwitch, Switch_Overdrive};
 
+DisplayModuleID DisplayReverbSwitchID	= {DisplayObjectSwitch, Switch_Reverb};
+
 //////////////////////////////
 //	Display buffer and buffer pointers
 //////////////////////////////
@@ -110,6 +112,9 @@ void RegisterModules()
 
 	// Register overdrive module
 	RegisterAudioModule(DisplayOverdriveSwitchID, &audioprocess.overdrive, audioprocess.overdrive.ModifiableMembers::Enable);
+
+	// Register reverb module
+	RegisterAudioModule(DisplayReverbSwitchID, &audioprocess.reverb, audioprocess.reverb.ModifiableMembers::Enable);
 }
 
 void InitDisplayModules(){

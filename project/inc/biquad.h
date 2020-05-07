@@ -43,7 +43,7 @@ public:
 	{};
 	~BiquadModule(){};
 	void Apply() override;
-	void Init(int blocksize, float* input_ptr);
+	int Init(int blocksize, float* input_ptr) override;
 	void Reset() override;
 	void SetMemberValue(uint8_t MemberId, uint8_t Value) override;
 	int GetMemberValue(uint8_t MemberId) override;

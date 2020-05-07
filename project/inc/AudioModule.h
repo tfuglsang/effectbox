@@ -25,9 +25,11 @@ extern "C" {
 		}
 
 		virtual void Apply(){};
+		virtual int Init(int block_size, float* input_ptr) = 0;
 		virtual void Reset(){};
 		virtual void SetMemberValue(uint8_t MemberId, uint8_t Value) = 0;
 		virtual int GetMemberValue(uint8_t MemberId) = 0;
+		virtual float* GetOutputPtr() = 0;
 	};
 }
 

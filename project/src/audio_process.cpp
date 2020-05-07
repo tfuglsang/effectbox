@@ -11,59 +11,59 @@ stack and heap) for application running on Cortex®-M7 CPU.
 
 AudioProcess audioprocess __ATTR_RAM_DTCM; // Use TCM ram for storing audio modules:
 
+int AudioProcess :: AddModule(AudioModule* module)
+{
+	this->modules[this->NumberOfModules++] = module;
+	return 1;
+}
+
 int AudioProcess :: Init(int blocksize, float* input_ptr)
 {
 	this->m_InputPtr = input_ptr;
 	this->m_Blocksize = blocksize;
 
-	biquad.Init(m_Blocksize, this->m_InputPtr);
+	AddModule(&biquad);
+	AddModule(&flanger);
+	AddModule(&overdrive);
+	AddModule(&wah);
+	AddModule(&volume);
+	AddModule(&reverb);
 
-	flanger.Init(m_Blocksize, biquad.GetOutputPtr());
+	this->modules[0]->Init(m_Blocksize, this->m_InputPtr);
+	for(int i = 1; i<NumberOfModules; i++)
+	{
+		this->modules[i]->Init(m_Blocksize, modules[i-1]->GetOutputPtr());
+	}
 
-	overdrive.Init(m_Blocksize, flanger.GetOutputPtr());
-
-	wah.Init(m_Blocksize, overdrive.GetOutputPtr());
-
-	volume.Init(m_Blocksize, wah.GetOutputPtr());
-
-	return 0;
+	return 1;
 }
-
+float OutputBuffer[256];
 void AudioProcess :: Apply()
 {
-	biquad.Apply();
+	int i = 0;
+	for(i = 0; i<NumberOfModules; i++)
+	{
+		this->modules[i]->Apply();
+	}
 
-	flanger.Apply();
-
-	overdrive.Apply();
-
-	wah.Apply();
-
-	volume.Apply();
-
-	float* FinalOutputPtr = volume.GetOutputPtr();
-
-	for(int i = 0; i < m_Blocksize; i++)
+	float* FinalOutputPtr = this->modules[NumberOfModules-1]->GetOutputPtr();
+		for(int i = 0; i < m_Blocksize; i++)
 	{
 		this->m_OutputBuffer[i*2] = FinalOutputPtr[i] * 2147483648;
 		this->m_OutputBuffer[i*2+1] = FinalOutputPtr[i] * 2147483648;
 	}
-
 }
 
 void AudioProcess :: Reset()
 {
-	biquad.Reset();
-
-	flanger.Reset();
-
-	overdrive.Reset();
-
-	wah.Reset();
-
-	volume.Reset();
+	for(int i = 0; i<NumberOfModules; i++)
+	{
+		this->modules[i]->Reset();
+	}
 }
 
+
+// Wrapper functions for C++
 void AudioProcessApply()
 {
 	audioprocess.Apply();
